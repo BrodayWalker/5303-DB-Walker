@@ -1,3 +1,3 @@
 # 5303-DB-Walker
 
-![Broday Walker](C:\Users\Broday\Pictures\Broday)
+![Broday Walker](https://www2.cisl.ucar.edu/sites/default/files/images/SIParCS-Headshots-01.jpg)
