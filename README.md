@@ -1,3 +1,3 @@
 # 5303-DB-Walker
 
-![Broday Walker](SIParCS-Headshots-01.jpg)
+![Broday Walker](SIParCS-Headshots-01.jpg =250x250)
