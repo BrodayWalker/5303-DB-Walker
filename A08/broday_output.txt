@@ -1,0 +1,1 @@
+*12\r\n$5\r\nHMSET\r\n$6\r\nuser:0\r\n$10\r\nfirst_name\r\n$5\r\nFlora\r\n$9\r\nlast_name\r\n$6\r\nAlbutt\r\n$5\r\nemail\r\n$18\r\nfalbutt0@wired.com\r\n$4\r\nlati\r\n$9\r\n33.048227\r\n$5\r\nlongi\r\n$10\r\n120.575443\r\n

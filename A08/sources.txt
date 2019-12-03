@@ -1,0 +1,9 @@
+# Lua Advantages - Stack Overflow
+https://stackoverflow.com/questions/19176209/why-do-we-need-an-embeddable-programming-language-like-lua
+
+# Mockaroo for all our data needs
+https://mockaroo.com/
+
+# Redis documentation
+https://redis.io/documentation
+

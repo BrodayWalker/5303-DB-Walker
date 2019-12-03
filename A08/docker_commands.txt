@@ -1,0 +1,14 @@
+# Start a single docker container running redis
+docker run -d -p 6379:6379 --name redis1 redis
+
+# Copy any necessary files from the host to the container (just like scp)
+docker cp <path_to_file>file.txt redis1:/<some_folder>
+
+# Start an interactive session with the container
+docker exec -it redis1 /bin/bash
+
+# Feed redis protocol data to redis (execute from bash)
+echo -e "$(cat some_file.txt)" | redis-cli --pipe
+
+
+
