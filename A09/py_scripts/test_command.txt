@@ -1,0 +1,1 @@
+*12\r\n$5\r\nHMSET\r\n$6\r\nuser:0\r\n$10\r\nfirst_name\r\n$6\r\nJaclyn\r\n$9\r\nlast_name\r\n$10\r\nDi Claudio\r\n$5\r\nemail\r\n$25\r\njdiclaudio0@woothemes.com\r\n$4\r\nlati\r\n$5\r\n-12.4\r\n$5\r\nlongi\r\n$5\r\n-74.7\r\n
