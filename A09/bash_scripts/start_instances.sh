@@ -47,6 +47,7 @@ do
 	cd ${port}
 	cat >redis.conf << EOF
 
+bind 10.0.88.173
 port ${port}
 cluster-enabled yes
 cluster-config-file nodes.conf
