@@ -47,8 +47,42 @@ def build_dict():
     print(f"{records} records inserted in hash in {elapsed} seconds.")
     return users
 
+# For checking the distribution of ages
+def count_ages(user_dict):
+    # Initialize a list with five elements for our seven categories
+    age_dist = [0] * 7
+
+    # Count the frequency of ages in range
+    for i in range(1, len(user_dict)):
+        age = user_dict[str(i)]['age']
+        age = int(age)
+        if (age >= 13 and age <= 17):
+            age_dist[0] += 1
+        elif (age >= 18 and age <= 24):
+            age_dist[1] += 1
+        elif (age >= 25 and age <= 34):
+            age_dist[2] += 1
+        elif (age >= 35 and age <= 44):
+            age_dist[3] += 1
+        elif (age >= 45 and age <= 54):
+            age_dist[4] += 1
+        elif (age >= 55 and age <= 64):
+            age_dist[5] += 1
+        elif (age >= 65):
+            age_dist[6] += 1
+
+    return age_dist
+
+# Used to assign each user some number of friends
+'''
+25% of users will have < 10 friends
+25% will have 10-25 friends
+25% will have 26-100 friends
+25% will have > 100 friends
+'''
 def allot_quota(user_dict):
     pass
+
 
 def print_to_json(user_dict):
     print("Writing users to json file...")
@@ -58,8 +92,12 @@ def print_to_json(user_dict):
 if __name__ == '__main__':
     user_list = {}
     user_list = build_dict()
-    print_to_json(user_list)
+
+    age_counts = count_ages(user_list)
+    print(age_counts)
 
 
 
+
+    #print_to_json(user_list)
 
