@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 
 #****************************************************************************
-# A simple script for building a list of friends for a redis cluster.
+# A script for building a list of friends for a redis cluster.
 #
 # Usage: ./friends_list.py 
 #****************************************************************************
 
 import json
+import pprint
+import random
 from timeit import default_timer as timer
 
 def build_dict():
@@ -20,31 +22,25 @@ def build_dict():
 
     # Build a dictionary of users using the fields given in the header and the
     # data provided in the line
-    print("Building hash...")
-    records = 0
+    print("Building dictionary...")
     users = {}
-    i = 1
 
     start = timer()
     for line in input:
         # Read the line and clean it up
         line = line.split(sep=",")
-        line[-1] = line[-1].rstrip()
+        line[-1] = line[-1].rstrip('\n')
 
-        # Check to see if the user is already in the hash
-        if line[0] not in users:
-            # Iterate through list to build the hash
-            users[line[0]] = {}
-            for j in range(1,len(line)):
-                users[line[0]][header[j]] = line[j]
-            records += 1
-        else:
-            pass
-        i += 1
+        users[line[0]] = {}
+        for j in range(1,len(line)):
+            users[line[0]][header[j]] = line[j]
+
     end = timer()
     elapsed = end - start
 
-    print(f"{records} records inserted in hash in {elapsed} seconds.")
+    print(f"Dictionary built in {elapsed} seconds.")
+
+    input.close()
     return users
 
 # For checking the distribution of ages
@@ -80,9 +76,21 @@ def count_ages(user_dict):
 25% will have 26-100 friends
 25% will have > 100 friends
 '''
-def allot_quota(user_dict):
-    pass
+def allot_quota(user_dict,ranges):
+    max_friends_list = []
+    # Outer loop iterations * inner loop iterations = len(user_dict)
+    for i in range(int(len(user_dict)/len(ranges))):
+        for j in range(len(ranges)):
+            max_friends_list.append(random.randint(ranges[j][0]+1, ranges[j][1]+1))
 
+    random.shuffle(max_friends_list)
+
+    # Assign each user a friend count
+    for i in range(0, len(user_dict) - 1):
+        i = str(i)
+        user_dict[i]['allowed'] = max_friends_list[int(i)]
+        user_dict[i]['friends'] = []
+        user_dict[i]['max'] = max_friends_list[int(i)]
 
 def print_to_json(user_dict):
     print("Writing users to json file...")
@@ -93,11 +101,10 @@ if __name__ == '__main__':
     user_list = {}
     user_list = build_dict()
 
-    age_counts = count_ages(user_list)
-    print(age_counts)
+    ranges = [[3,10],[11,25],[26,100],[101,250]]
+    allot_quota(user_list, ranges)
 
-
-
+    print(temp_user2['0'])
 
     #print_to_json(user_list)
 
