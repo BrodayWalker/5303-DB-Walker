@@ -127,7 +127,7 @@ def make_friends(users):
         fails = 0
         user = str(user)
         # Loops until user hits friend quota or fails too many times
-        while (users[user]['f_left'] > 0 and fails < 100):
+        while (users[user]['f_left'] > 0 and fails < 1000):
             # Get index of potential friend
             potential = int((len(users) - 1) * random.random())
             potential = str(potential)
@@ -145,8 +145,26 @@ def make_friends(users):
     elapsed = end - start
     print(f"Matched friends for {elapsed} seconds.")
 
-def make_friends_test():
-    pass
+def make_friends_test(users):
+    '''
+    A test to measure the effectiveness of the friend-finding algorithm
+    Compare the average expected friend count vs. the actual friend count
+    '''
+    expected_sum = 0
+    actual_sum = 0
+    # TODO: fix dict len error. It is 1 too big. Change test
+    for user in range(0, len(users) - 2):
+        user = str(user)
+        expected_sum += users[user]['max']
+        actual_sum += len(users[user]['friends'])
+    
+    expected_average = expected_sum / (len(users) - 1)
+    actual_average = actual_sum / (len(users) - 1)
+
+    print(f"Average expected friend count: {expected_average}")
+    print(f"Actual average friend count: {actual_average}")
+
+
 
 def print_to_json(user_dict):
     print("Writing users to json file...")
@@ -174,3 +192,5 @@ if __name__ == '__main__':
     print(user_list['9999']['max'])
     print(user_list['9999']['f_left'])
 
+    print("Average friend test")
+    make_friends_test(user_list)
