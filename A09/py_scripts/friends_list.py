@@ -12,6 +12,11 @@ import random
 from timeit import default_timer as timer
 
 def build_dict():
+    '''
+    Read in data in csv format. From this data, build a dictionary with
+    all users and their information contained within. 
+    '''
+
     # Open the input file
     input = open('data.csv', 'r')
 
@@ -43,8 +48,11 @@ def build_dict():
     input.close()
     return users
 
-# For checking the distribution of ages
 def count_ages(user_dict):
+    '''
+    For checking the distribution of ages
+    '''
+
     # Initialize a list with five elements for our seven categories
     age_dist = [0] * 7
 
@@ -69,14 +77,17 @@ def count_ages(user_dict):
 
     return age_dist
 
-# Used to assign each user some number of friends
-'''
-25% of users will have < 10 friends
-25% will have 10-25 friends
-25% will have 26-100 friends
-25% will have > 100 friends
-'''
+
+
 def allot_quota(user_dict,ranges):
+    '''
+    Used to assign each user some number of friends
+    25% of users will have < 10 friends
+    25% will have 10-25 friends
+    25% will have 26-100 friends
+    25% will have > 100 friends
+    '''
+
     max_friends_list = []
     # Outer loop iterations * inner loop iterations = len(user_dict)
     for i in range(int(len(user_dict)/len(ranges))):
@@ -88,9 +99,54 @@ def allot_quota(user_dict,ranges):
     # Assign each user a friend count
     for i in range(0, len(user_dict) - 1):
         i = str(i)
-        user_dict[i]['allowed'] = max_friends_list[int(i)]
+        user_dict[i]['f_left'] = max_friends_list[int(i)]
         user_dict[i]['friends'] = []
         user_dict[i]['max'] = max_friends_list[int(i)]
+
+def make_friends(users):
+    '''
+    An algorithm for building every user's friends list. This loops through
+    all users in the dictionary.
+
+    Step 1: randomly select potential friend
+    Successful try:
+    Step 2: potential friend can accept more friends, both users add each other
+    Step 3: decrement f_left for both users
+    Step 4: try again
+    Unsuccessful try:
+    Step 2: potential friend is already a friend or cannot accept more friends,
+        increment failure counter
+    Step 3: try again
+
+    The loop stops when f_left = 0 or fails = 10 to avoid trying forever.
+    '''
+    print("Starting friend finder...")
+    start = timer()
+    # TODO: Fix dict len error. It is 1 too big
+    for user in range(0, len(users) - 2):
+        fails = 0
+        user = str(user)
+        # Loops until user hits friend quota or fails too many times
+        while (users[user]['f_left'] > 0 and fails < 100):
+            # Get index of potential friend
+            potential = int((len(users) - 1) * random.random())
+            potential = str(potential)
+            if(users[potential]['f_left'] > 0 and potential not in users[user]['friends']):
+                # Add both users to each other's friends list
+                users[user]['friends'].append(potential)
+                users[potential]['friends'].append(user)
+                # Decrement friends left list
+                users[user]['f_left'] -= 1
+                users[potential]['f_left'] -= 1
+            else:
+                fails += 1
+
+    end = timer()
+    elapsed = end - start
+    print(f"Matched friends for {elapsed} seconds.")
+
+def make_friends_test():
+    pass
 
 def print_to_json(user_dict):
     print("Writing users to json file...")
@@ -104,7 +160,17 @@ if __name__ == '__main__':
     ranges = [[3,10],[11,25],[26,100],[101,250]]
     allot_quota(user_list, ranges)
 
-    print(temp_user2['0'])
+    print(len(user_list))
 
-    #print_to_json(user_list)
+    make_friends(user_list)
+
+    print("User 0:")
+    print(user_list['0']['friends'])
+    print(user_list['0']['max'])
+    print(user_list['0']['f_left'])
+
+    print("User 9999:")
+    print(user_list['9999']['friends'])
+    print(user_list['9999']['max'])
+    print(user_list['9999']['f_left'])
 
