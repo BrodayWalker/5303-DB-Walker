@@ -52,12 +52,12 @@ def count_ages(user_dict):
     '''
     For checking the distribution of ages
     '''
-
     # Initialize a list with five elements for our seven categories
     age_dist = [0] * 7
+    percentage = [0] * 7
 
     # Count the frequency of ages in range
-    for i in range(1, len(user_dict)):
+    for i in range(1, len(user_dict) - 1):
         age = user_dict[str(i)]['age']
         age = int(age)
         if (age >= 13 and age <= 17):
@@ -75,9 +75,11 @@ def count_ages(user_dict):
         elif (age >= 65):
             age_dist[6] += 1
 
-    return age_dist
-
-
+    total_pop = sum(age_dist)
+    print("Age distributions: ")
+    for i in range(len(age_dist)):
+        percentage[i] = (age_dist[i] / total_pop) * 100
+        print(f"{round(percentage[i],2)}%")
 
 def allot_quota(user_dict,ranges):
     '''
@@ -103,7 +105,7 @@ def allot_quota(user_dict,ranges):
         user_dict[i]['friends'] = []
         user_dict[i]['max'] = max_friends_list[int(i)]
 
-def make_friends(users):
+def make_friends(users, tries=1000):
     '''
     An algorithm for building every user's friends list. This loops through
     all users in the dictionary.
@@ -118,7 +120,8 @@ def make_friends(users):
         increment failure counter
     Step 3: try again
 
-    The loop stops when f_left = 0 or fails = 10 to avoid trying forever.
+    The loop stops when f_left = 0 or fails = number of tries allowed to 
+    avoid trying forever.
     '''
     print("Starting friend finder...")
     start = timer()
@@ -127,8 +130,10 @@ def make_friends(users):
         fails = 0
         user = str(user)
         # Loops until user hits friend quota or fails too many times
-        while (users[user]['f_left'] > 0 and fails < 1000):
+        while (users[user]['f_left'] > 0 and fails < tries):
             # Get index of potential friend
+            # len(users) - 1 * random.random() is used instead of 
+            # random.ranint(0,len(users)-1) because it is much faster
             potential = int((len(users) - 1) * random.random())
             potential = str(potential)
             if(users[potential]['f_left'] > 0 and potential not in users[user]['friends']):
@@ -164,8 +169,6 @@ def make_friends_test(users):
     print(f"Average expected friend count: {expected_average}")
     print(f"Actual average friend count: {actual_average}")
 
-
-
 def print_to_json(user_dict):
     print("Writing users to json file...")
     with open('data.json', 'w', encoding='utf-8') as f:
@@ -194,3 +197,4 @@ if __name__ == '__main__':
 
     print("Average friend test")
     make_friends_test(user_list)
+    count_ages(user_list)
