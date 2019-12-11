@@ -229,19 +229,33 @@ def messages_to_json(messages):
         json.dump(messages, f)
     
 
-def redis_plain_users():
+def redis_plain_users(users):
     '''
-    Prints plain text redis commands for inserting the user data generated
-    in this script into a redis instance.
+    Prints plain-text redis commands for inserting the user data generated
+    in this script into a redis instance using HMSET.
     '''
     pass
 
-def redis_plain_messages():
+def redis_plain_messages(messages):
     '''
-    Prints plain text redis commands for inserting the message data generated
-    in this script into a redis instance.
+    Prints plain-text redis commands for inserting the message data generated
+    in this script into a redis instance using HMSET.
     '''
-    pass
+    commands = 0
+    print("Creating plain-text redis commands for inserting messages...")
+    f = open('redis_messages.txt', 'w')
+    start = timer()
+    for i in range(len(messages)):
+        i = str(i)
+        f.write("HMSET message{} send \"{}\" rec \"{}\" message \"{}\"\n".format(i, messages['message'+i]['send'], messages['message'+i]['rec'], messages['message'+i]['message']))
+        commands += 1
+
+    end = timer()
+    elapsed = end - start
+    f.close()
+
+    print(f"Created {commands} commands in {elapsed} seconds.")
+
 
 
 if __name__ == '__main__':
@@ -259,6 +273,9 @@ if __name__ == '__main__':
     # Create simulated message traffic
     text_model = make_model()
     build_messages(text_model, messages, user_list)
+
+    # Test plain-text redis command generator
+    redis_plain_messages(messages)
 
     '''
     Some tests:
