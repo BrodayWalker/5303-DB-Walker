@@ -217,14 +217,17 @@ def users_to_json(user_dict):
     Prints the users dictionary to a json file
     '''
     print("Writing users to json file...")
-    with open('data.json', 'w', encoding='utf-8') as f:
+    with open('user_data.json', 'w', encoding='utf-8') as f:
         json.dump(user_dict, f)
 
 def messages_to_json(messages):
     '''
     Prints the messages dictionary to a json file
     '''
-    pass
+    print("Writing messages to json file...")
+    with open('message_data.json', 'w', encoding='utf-8') as f:
+        json.dump(messages, f)
+    
 
 def redis_plain_users():
     '''
