@@ -20,7 +20,7 @@ def build_dict():
     '''
 
     # Open the input file
-    input = open('data.csv', 'r')
+    input = open('user_data.csv', 'r')
 
     # The first line contains the name of each field
     header = input.readline() # Read the line
@@ -127,8 +127,7 @@ def make_friends(users, tries=1000):
     '''
     print("Starting friend finder...")
     start = timer()
-    # TODO: Fix dict len error. It is 1 too big
-    for user in range(0, len(users) - 2):
+    for user in range(0, len(users) - 1):
         fails = 0
         user = str(user)
         # Loops until user hits friend quota or fails too many times
@@ -159,14 +158,13 @@ def make_friends_test(users):
     '''
     expected_sum = 0
     actual_sum = 0
-    # TODO: fix dict len error. It is 1 too big. Change test
-    for user in range(0, len(users) - 2):
+    for user in range(0, len(users) - 1):
         user = str(user)
         expected_sum += users[user]['max']
         actual_sum += len(users[user]['friends'])
     
-    expected_average = expected_sum / (len(users) - 1)
-    actual_average = actual_sum / (len(users) - 1)
+    expected_average = expected_sum / (len(users))
+    actual_average = actual_sum / (len(users))
 
     print(f"Average expected friend count: {expected_average}")
     print(f"Actual average friend count: {actual_average}")
@@ -304,22 +302,3 @@ if __name__ == '__main__':
     # Test plain-text redis command generator
     redis_plain_messages(messages)
     redis_plain_users(user_list)
-    '''
-    Some tests:
-
-    print(len(user_list))
-    
-    print("User 0:")
-    print(user_list['0']['friends'])
-    print(user_list['0']['max'])
-    print(user_list['0']['f_left'])
-
-    print("User 9999:")
-    print(user_list['9999']['friends'])
-    print(user_list['9999']['max'])
-    print(user_list['9999']['f_left'])
-
-    print("Average friend test")
-    make_friends_test(user_list)
-    count_ages(user_list)
-    '''
