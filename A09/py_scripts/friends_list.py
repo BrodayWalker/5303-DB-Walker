@@ -197,7 +197,7 @@ def build_messages(text_model, messages, users, num_mess=1000):
         as the receiver
     Step 3: Insert into messages dictionary
     '''
-    
+    start = timer()
     for i in range(num_mess):
         # Select a random user to be the sender
         send = int((len(users) - 1) * random.random())
@@ -211,6 +211,10 @@ def build_messages(text_model, messages, users, num_mess=1000):
         message = text_model.make_sentence()
         # Place message in dictionary
         messages['message{}'.format(i)] = {'send': send, 'rec': rec, 'message': message}
+
+    end = timer()
+    elapsed = end - start
+    print(f"Generated {num_mess} in {elapsed} seconds.")
 
 def users_to_json(user_dict):
     '''
@@ -232,9 +236,33 @@ def messages_to_json(messages):
 def redis_plain_users(users):
     '''
     Prints plain-text redis commands for inserting the user data generated
-    in this script into a redis instance using HMSET.
+    in this script into a redis instance using HMSET. The friends list is created
+    in a separate file and uses redis sets.
+
+    User information: email, username, first_name, last_name, 
+    password, create_time, last_update, age
+    The user category information is hardcoded to avoid making too many 
+    lines in the text file.
     '''
-    pass
+
+    print("Creating plain-text redis commands for inserting users and friends lists...")
+    u = open('redis_users.txt', 'w')
+    fr = open('redis_friends.txt', 'w')
+
+    start = timer()
+    for i in range(len(users) - 1):
+        i = str(i)
+        u.write("HMSET user{} email {} username {} first_name {} last_name {} password {} create_time {} last_update {} age {}\n".format(
+            i, users[i]['email'], users[i]['username'], users[i]['first_name'], users[i]['last_name'],
+            users[i]['password'], users[i]['create_time'], users[i]['last_update'], users[i]['age']))
+        for j in range(len(users[i]['friends'])):
+            fr.write("SADD friends{} {}\n".format(i, users[i]['friends'][j]))
+    end = timer()
+    elapsed = end - start
+    print(f"Finished generating user and friend commands for redis in {elapsed} seconds.")
+
+    u.close()
+    fr.close()
 
 def redis_plain_messages(messages):
     '''
@@ -259,7 +287,6 @@ def redis_plain_messages(messages):
 
 
 if __name__ == '__main__':
-    text_model=None
     messages = {}
     user_list = {}
     ranges = [[3,10],[11,25],[26,100],[101,250]]
@@ -276,7 +303,7 @@ if __name__ == '__main__':
 
     # Test plain-text redis command generator
     redis_plain_messages(messages)
-
+    redis_plain_users(user_list)
     '''
     Some tests:
 
