@@ -11,6 +11,7 @@ import pprint
 import random
 import io
 import markovify
+from numba import njit
 from timeit import default_timer as timer
 
 def build_dict():
@@ -59,7 +60,7 @@ def count_ages(user_dict):
     percentage = [0] * 7
 
     # Count the frequency of ages in range
-    for i in range(1, len(user_dict) - 1):
+    for i in range(0, len(user_dict)):
         age = user_dict[str(i)]['age']
         age = int(age)
         if (age >= 13 and age <= 17):
@@ -101,11 +102,12 @@ def allot_quota(user_dict,ranges):
     random.shuffle(max_friends_list)
 
     # Assign each user a friend count
-    for i in range(0, len(user_dict) - 1):
+    for i in range(0, len(user_dict)):
         i = str(i)
         user_dict[i]['f_left'] = max_friends_list[int(i)]
         user_dict[i]['friends'] = []
         user_dict[i]['max'] = max_friends_list[int(i)]
+        user_dict[i]['fails'] = int
 
 def make_friends(users, tries=1000):
     '''
@@ -127,7 +129,7 @@ def make_friends(users, tries=1000):
     '''
     print("Starting friend finder...")
     start = timer()
-    for user in range(0, len(users) - 1):
+    for user in range(0, len(users)):
         fails = 0
         user = str(user)
         # Loops until user hits friend quota or fails too many times
@@ -146,6 +148,7 @@ def make_friends(users, tries=1000):
                 users[potential]['f_left'] -= 1
             else:
                 fails += 1
+        users[user]['fails'] = fails
 
     end = timer()
     elapsed = end - start
@@ -158,7 +161,8 @@ def make_friends_test(users):
     '''
     expected_sum = 0
     actual_sum = 0
-    for user in range(0, len(users) - 1):
+    print("Starting friend-making algorithm effectiveness test...")
+    for user in range(0, len(users)):
         user = str(user)
         expected_sum += users[user]['max']
         actual_sum += len(users[user]['friends'])
@@ -168,6 +172,10 @@ def make_friends_test(users):
 
     print(f"Average expected friend count: {expected_average}")
     print(f"Actual average friend count: {actual_average}")
+
+def fail_stats(users):
+    for i in range(0, len(users)):
+        print(f"Fails user{str(i)}: {users[str(i)]['fails']}")
 
 def make_model():
     '''
@@ -195,6 +203,7 @@ def build_messages(text_model, messages, users, num_mess=1000):
         as the receiver
     Step 3: Insert into messages dictionary
     '''
+    print("Building messages...")
     start = timer()
     for i in range(num_mess):
         # Select a random user to be the sender
@@ -295,6 +304,9 @@ if __name__ == '__main__':
     allot_quota(user_list, ranges)
     # Build a list of friends for each user
     make_friends(user_list)
+    fail_stats(user_list)
+    
+    '''
     # Create simulated message traffic
     text_model = make_model()
     build_messages(text_model, messages, user_list)
@@ -302,3 +314,4 @@ if __name__ == '__main__':
     # Test plain-text redis command generator
     redis_plain_messages(messages)
     redis_plain_users(user_list)
+    '''
