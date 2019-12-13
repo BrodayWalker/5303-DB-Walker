@@ -105,9 +105,9 @@ def allot_quota(user_dict,ranges):
     for i in range(0, len(user_dict)):
         i = str(i)
         user_dict[i]['f_left'] = max_friends_list[int(i)]
-        user_dict[i]['friends'] = []
+        user_dict[i]['friends'] = set()
         user_dict[i]['max'] = max_friends_list[int(i)]
-        user_dict[i]['fails'] = int
+        user_dict[i]['fails'] = 0
 
 def make_friends(users, tries=1000):
     '''
@@ -126,6 +126,8 @@ def make_friends(users, tries=1000):
 
     The loop stops when f_left = 0 or fails = number of tries allowed to 
     avoid trying forever.
+
+    The algorithm usually runs in 5.75 minutes for 1,000,000 users.
     '''
     print("Starting friend finder...")
     start = timer()
@@ -139,16 +141,66 @@ def make_friends(users, tries=1000):
             # random.ranint(0,len(users)-1) because it is much faster
             potential = int((len(users) - 1) * random.random())
             potential = str(potential)
-            if(users[potential]['f_left'] > 0 and potential not in users[user]['friends']):
+            if(users[potential]['f_left'] > 0):
                 # Add both users to each other's friends list
-                users[user]['friends'].append(potential)
-                users[potential]['friends'].append(user)
+                users[user]['friends'].add(potential)
+                users[potential]['friends'].add(user)
                 # Decrement friends left list
                 users[user]['f_left'] -= 1
                 users[potential]['f_left'] -= 1
             else:
                 fails += 1
         users[user]['fails'] = fails
+
+    end = timer()
+    elapsed = end - start
+    print(f"Matched friends for {elapsed} seconds.")
+
+def random_make_friends(users, fails=1000, flex=0.05):
+    '''
+    This is the make_friends algorithm with a twist for testing purposes.
+    Rather than looping through the dictionary of users in order
+    from 0 to len(users) - 1 trying to find random friends, we will choose
+    a random user to find a random friend. This new algorithm is an attempt
+    to avoid the slow-down that comes at the end of the loop when most users
+    toward the front of the dictionary have met their friend quota while 
+    the users at the end have a disporportionately low friend count.
+
+    The flex argument allows us to accept a number of friend connections
+    less than the ideal number to avoid the high cost of making those final
+    few friend connections.
+    '''
+    print("Starting test friend-finding algorithm...")
+    start = timer()
+
+    friends_made = 0
+    total_friend_quota = 0
+    len_users = len(users)
+
+    # Loop through the dictionary to see the total number of connections needed
+    # TODO: sum total friends needed in the allot_quota function
+    for i in range(0, len(users)):
+        total_friend_quota += users[str(i)]['max']
+
+    quota = total_friend_quota - (total_friend_quota * flex)
+    while(friends_made < quota):
+        # Pick a random user
+        rand_user = int(len_users * random.random())
+        rand_user = str(rand_user)
+        if (users[rand_user]['f_left'] > 0 and users[rand_user]['fails'] < fails):
+            # Find a potential friend to connect with
+            rand_potential = int(len_users * random.random())
+            rand_potential = str(rand_potential)
+            if (users[rand_potential]['f_left'] > 0 and rand_potential not in users[rand_user]['friends']):
+                # Add each other as friends
+                users[rand_user]['friends'].append(rand_potential)
+                users[rand_potential]['friends'].append(rand_user)
+                # Decrement f_left
+                users[rand_user]['f_left'] -= 1
+                users[rand_potential]['f_left'] -= 1
+                friends_made += 1
+            else:
+                users[rand_user]['fails'] += 1
 
     end = timer()
     elapsed = end - start
@@ -173,9 +225,33 @@ def make_friends_test(users):
     print(f"Average expected friend count: {expected_average}")
     print(f"Actual average friend count: {actual_average}")
 
-def fail_stats(users):
+def fail_stats(users, zeros=True, max=1000):
+    '''
+    A function for getting failure rate statistics for the friend-finding algorithm.
+    Statistics include total failures as well as failures per user.
+
+    If zeros=False, users who failed 0 times during match-making will not be shown.
+    The max argument corresponds to the maximum number of tries a user can make
+    in the process of meeting their friend quota.
+    '''
+    total_fails = 0
+    max_fail_count = 0
+    print("Grabbing failure statistics...")
     for i in range(0, len(users)):
-        print(f"Fails user{str(i)}: {users[str(i)]['fails']}")
+        i = str(i)
+        total_fails += users[i]['fails']
+        if (users[i]['fails'] == max):
+            max_fail_count += 1
+        if(zeros):
+            print(f"Fails for user{i}: {users[i]['fails']}")
+        else:
+            if(users[i]['fails'] == 0):
+                pass
+            else:
+                print(f"Fails for user{i}: {users[i]['fails']}")
+    print(f"Total users: {len(users)}")
+    print(f"Total fails: {total_fails}")
+    print(f"Total users who failed {max} times: {max_fail_count}")
 
 def make_model():
     '''
@@ -292,7 +368,6 @@ def redis_plain_messages(messages):
     print(f"Created {commands} commands in {elapsed} seconds.")
 
 
-
 if __name__ == '__main__':
     messages = {}
     user_list = {}
@@ -304,7 +379,9 @@ if __name__ == '__main__':
     allot_quota(user_list, ranges)
     # Build a list of friends for each user
     make_friends(user_list)
-    fail_stats(user_list)
+    #fail_stats(user_list, False)
+    make_friends_test(user_list)
+
     
     '''
     # Create simulated message traffic
